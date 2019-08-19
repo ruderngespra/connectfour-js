@@ -1,0 +1,53 @@
+connectFour.prototype.startTerminalInterface = function() {
+    var currentGame = this;
+    console.log('How many players?');
+    var standard_input = process.stdin;
+    standard_input.setEncoding('utf-8');
+
+    // function play() {
+    //     standard_input.on('data', function(data) {
+    //         var playersAmount = data;
+    //         console.log(playersAmount);
+
+    //         process.exit();
+    //     });
+    // }
+
+    standard_input.on('data', function(data) {
+        console.log('How many columns?');
+        var columns = data;
+        console.log(player, columns);
+        // try {
+        //     currentGame = currentGame.nextMove(data);
+        //     if (currentGame.winner !== false) {
+        //         console.log(currentGame.clearMonitorString);
+        //         console.log(currentGame.toString(), '\n');
+        //         console.log(currentGame.winner, ' won.');
+        //         var exclamation = '!';
+        //         function animateWin(counter = 0) {
+        //             // var timer = setTimeout(function() {
+        //             //     console.log(exclamation);
+        //             //     counter++;
+        //             //     if (counter == 5) {
+        //             //         clearTimeout(timer);
+        //             //         currentGame.animateLastMove();
+        //             //     } else {
+        //             //         animateWin(counter);
+        //             //     }
+        //             // }, 200);
+        //             process.exit();
+        //         }
+        //         animateWin();
+        //     } else {
+        //         console.log(currentGame.clearMonitorString);
+        //         currentGame.animateLastMove();
+        //     }
+        // } catch (err) {
+        //     console.log(currentGame.clearMonitorString);
+        //     console.log(currentGame.toString());
+        //     console.log(
+        //         'Please choose a number between 0 and ' + currentGame.x + '.'
+        //     );
+        // }
+    });
+};

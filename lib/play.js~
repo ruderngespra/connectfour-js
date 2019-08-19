@@ -1,0 +1,88 @@
+var { connectFour } = require('./connectFour.js');
+
+function play(gameSettings, game) {
+    var standard_input = process.stdin;
+    standard_input.setEncoding('utf-8');
+    if (!gameSettings.playersAmount) {
+        console.log('How many players?');
+        standard_input.once('data', function(data) {
+            var playersAmount = data;
+            gameSettings.playersAmount = playersAmount;
+            play(gameSettings);
+        });
+    } else if (!gameSettings.x) {
+        console.log('How many columns?');
+        standard_input.once('data', function(data) {
+            var x = data;
+            gameSettings.x = x;
+            play(gameSettings);
+        });
+    } else if (!gameSettings.y) {
+        console.log('How many rows?');
+        standard_input.once('data', function(data) {
+            var y = data;
+            gameSettings.y = y;
+            play(gameSettings);
+        });
+    } else if (game) {
+        console.log(game.clearMonitorString);
+        console.log(game.toString(), '\n');
+        standard_input.once('data', function(data) {
+            function tryMove(data) {
+                try {
+                    game = game.nextMove(data);
+                    if (game.winner !== false) {
+                        console.log(game.clearMonitorString);
+                        console.log(game.toString(), '\n');
+                        console.log(game.winner, ' won.');
+                        var exclamation = '!';
+                        function animateWin(counter = 0) {
+                            var timer = setTimeout(function() {
+                                console.log(exclamation);
+                                counter++;
+                                if (counter == 5) {
+                                    clearTimeout(timer);
+                                    game.animateLastMove();
+                                } else {
+                                    animateWin(counter);
+                                }
+                            }, 200);
+                            process.exit();
+                        }
+                        animateWin();
+                    } else {
+                        console.log(game.clearMonitorString);
+                        game.animateLastMove();
+                        play(gameSettings, game);
+                    }
+                } catch (err) {
+                    console.log(game.clearMonitorString);
+                    console.log(game.toString());
+                    console.log(
+                        'Please choose a number between 0 and ' + game.x + '.'
+                    );
+                    tryMove();
+                }
+            }
+            tryMove(data);
+        });
+    } else {
+        game = new connectFour(gameSettings);
+        play(gameSettings, game);
+    }
+}
+
+play({
+    turn: '0',
+    winner: false,
+    connectAmount: 4,
+});
+
+// var game = new connectFour({
+//     x: 8,
+//     y: 8,
+//     turn: '0',
+//     winner: false,
+//     playersAmount: 2,
+//     connectAmount: 4,
+// });

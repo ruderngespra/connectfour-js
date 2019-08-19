@@ -1,0 +1,190 @@
+function buildBoard(x, y) {
+    var xCounter = 0;
+    var yCounter = 0;
+    var board = [];
+    for (var i = 0; i < x * y; i += 1) {
+        if (xCounter == x) {
+            xCounter = 0;
+            yCounter += 1;
+        }
+        board.push([xCounter, yCounter]);
+        xCounter += 1;
+    }
+    board.map(function(position) {
+        position.push(null);
+    });
+    return board;
+}
+
+function connectFour(settings) {
+    this.x = settings.x ? settings.x : 8;
+    this.y = settings.y ? settings.y : 8;
+    this.turn = String(settings.turn);
+    this.history = settings.history;
+    this.board =
+        this.history.length > 0
+            ? this.history[this.history.length - 1]
+            : buildBoard(this.x, this.y);
+    this.playersAmount = settings.playersAmount;
+    this.connectAmount = settings.connectAmount;
+    this.winner = false;
+}
+
+connectFour.prototype.toString = function(board) {
+    var currentBoard = board ? board : this.board;
+    var x = this.x;
+    return this.board
+        .reduce(function(total, position, index) {
+            var returnValue =
+                total + '|' + (position[2] == null ? '_' : position[2]) + '|';
+            index = index += 1;
+            if (index % x == 0) {
+                returnValue += '\n';
+            }
+            return returnValue;
+        }, '')
+        .split('\n')
+        .reverse()
+        .join('\n');
+};
+
+connectFour.prototype.nextMove = function(x) {
+    // output this into own function?
+    var position = this.board.find(function(position) {
+        return position[0] == x && position[2] == null;
+    });
+    var newValueAtPosition = position.slice();
+    newValueAtPosition[2] = this.turn;
+    var nextBoard = this.board.slice().map(function(internPosition) {
+        return position == internPosition ? newValueAtPosition : internPosition;
+    });
+    var nextTurn =
+        Number(this.turn) < this.playersAmount - 1 ? Number(this.turn) + 1 : 0;
+    var nextHistory = this.history.slice();
+    nextHistory.push(nextBoard);
+    var nextGameState = new connectFour({
+        x: this.x,
+        y: this.y,
+        history: nextHistory,
+        playersAmount: this.playersAmount,
+        connectAmount: this.connectAmount,
+        turn: nextTurn,
+    });
+    if (nextGameState.checkAll(this.turn)) {
+        nextGameState.winner = this.turn;
+    }
+    return nextGameState;
+};
+
+function findColorAtSpecificPositionInBoardArray(x, y, array) {
+    return array.find(function(position) {
+        return position[0] == x && position[1] == y;
+    })
+        ? array.find(function(position) {
+              return position[0] == x && position[1] == y;
+          })[2]
+        : null;
+}
+
+function check([x, y], color, array, direction, connectAmount, counter = 0) {
+    var newColor = findColorAtSpecificPositionInBoardArray(x, y, array);
+    if (newColor == color) {
+        counter += 1;
+        console.log(connectAmount);
+        console.log(counter);
+        if (counter == connectAmount) {
+            // console.log(color + ' won.');
+            return true;
+        }
+        if (direction == 'up') {
+            y += 1;
+        } else if (direction == 'right') {
+            x += 1;
+        } else if (direction == 'upRight') {
+            x += 1;
+            y += 1;
+        } else if (direction == 'downRight') {
+            x += 1;
+            y -= 1;
+        }
+        return check([x, y], color, array, direction, connectAmount, counter);
+    }
+}
+// This will loop through the board-array:
+// TODO: Refactor.
+
+connectFour.prototype.checkAll = function(color) {
+    var currentConnectAmount = this.connectAmount;
+    console.log('Current', currentConnectAmount);
+    return this.board.find(function(position, index, array) {
+        return (
+            check(
+                [position[0], position[1]],
+                color,
+                array,
+                'up',
+                currentConnectAmount
+            ) ||
+            check(
+                [position[0], position[1]],
+                color,
+                array,
+                'right',
+                currentConnectAmount
+            ) ||
+            check(
+                [position[0], position[1]],
+                color,
+                array,
+                'upRight',
+                currentConnectAmount
+            ) ||
+            check(
+                [position[0], position[1]],
+                color,
+                array,
+                'downRight',
+                currentConnectAmount
+            )
+        );
+    });
+};
+
+connectFour.prototype.return = function(steps = 1) {
+    var stepsToGoBack = steps % this.playersAmount;
+    var newTurn = Number(this.turn) - stepsToGoBack;
+    if (newTurn < 0) {
+        newTurn = this.playersAmount + newTurn;
+    }
+    console.log(newTurn);
+    return new connectFour({
+        x: this.x,
+        y: this.y,
+        history: this.history.slice(0, this.history.length - 1),
+        playersAmount: this.playersAmount,
+        connectAmount: this.connectAmount,
+        turn: newTurn,
+    });
+};
+
+connectFour.prototype.startTerminalInterface = function() {
+    var standard_input = process.stdin;
+    standard_input.setEncoding('utf-8');
+    var clearMonitorString = '';
+    for (var i = 0; i < 50; i += 1) {
+        clearMonitorString += '\n';
+    }
+    console.log(this.toString());
+    console.log(this.turn + 's turn. Enter a number:');
+    var currentGame = this;
+    standard_input.once('data', function(data) {
+        var nextPosition = currentGame.nextMove(data);
+        if (nextPosition.winner !== false) {
+            console.log(nextPosition.toString(), '\n');
+            console.log(nextPosition.winner, ' won.');
+            process.exit();
+        } else {
+            nextPosition.startTerminalInterface();
+        }
+    });
+};
