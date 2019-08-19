@@ -1,0 +1,20 @@
+{
+  "name": "connectfour",
+  "version": "1.0.0",
+  "description": "Connect four game for the command line.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "game",
+    "connectfour",
+    "connect-four",
+    "command-line"
+  ],
+  "author": "ruderngespra",
+  "license": "ISC"
+}
