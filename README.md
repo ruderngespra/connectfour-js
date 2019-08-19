@@ -1,4 +1,4 @@
-### Connect Four
+# Connect Four
 Simple connect four game for the command line.
 
 ### Install
@@ -11,6 +11,6 @@ npm install --global connectfour-js
 c4
 ```
 
-### Example
+### Example Game
 
 ![Example](demo/c4.gif)
