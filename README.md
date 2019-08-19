@@ -10,3 +10,7 @@ npm install --global connectfour-js
 ```
 c4
 ```
+
+### Example
+
+![Example](demo/c4.gif)
