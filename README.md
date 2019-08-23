@@ -1,5 +1,5 @@
-# Connect Four
-Simple connect four game for the command line.
+### Connect Four
+Connect four game for the command line built as an exercise during [spiced](https://github.com/spicedacademy/) bootcamp. Written in pre ES6 Vanilla JavaScript.
 
 ### Install
 ```
